@@ -9,15 +9,15 @@ import pandas as pd
 from datetime import datetime as dt
 
 
-def fetch_data_from_URL_query():
-    url = 'https://services1.arcgis.com/vHnIGBHHqDR6y0CR/arcgis/rest/services/Victorian_LGA_Cases/FeatureServer/0/query?where=1%3D1&outFields=*&returnGeometry=false&outSR=173&f=json'
+def fetch_data_from_URL_query(url):
     r = requests.get(url)
     return r.json()
     
     
 def create_excel_with_LGA_data(excel_file_name = 'covid_data_VIC.xlsx'):
     """the variable - name of the excel file, default is 'covid_data_VIC.xlsx'"""
-    r_json = fetch_data_from_URL_query()
+    url = 'https://services1.arcgis.com/vHnIGBHHqDR6y0CR/arcgis/rest/services/Victorian_LGA_Cases/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json'
+    r_json = fetch_data_from_URL_query(url)
     data = r_json['features']
     
     # Columns in excel
@@ -38,8 +38,9 @@ def create_excel_with_LGA_data(excel_file_name = 'covid_data_VIC.xlsx'):
 def append_daily_cases(excel_file_name = 'covid_data_VIC.xlsx'):
     """append new accumulative data as a new column to excel"""
     """the variable - name of the file to be appended data, default is 'covid_data_VIC.xlsx'"""
-
-    r_json = fetch_data_from_URL_query()
+    
+    url = 'https://services1.arcgis.com/vHnIGBHHqDR6y0CR/arcgis/rest/services/Victorian_LGA_Cases/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json'
+    r_json = fetch_data_from_URL_query(url)
     data = r_json['features']
 
     # Columns in excel
