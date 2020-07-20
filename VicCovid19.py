@@ -15,40 +15,29 @@ def fetch_data_from_URL_query():
     return r.json()
     
     
-def create_excel_with_LGA_data():
+def create_excel_with_LGA_data(excel_file_name = 'covid_data_VIC.xlsx'):
+    """the variable - name of the excel file, default is 'covid_data_VIC.xlsx'"""
     r_json = fetch_data_from_URL_query()
     data = r_json['features']
-
-    # data of LGA in VIC    
-    integrated_data = []
-
+    
     # Columns in excel
     lga_name = []
     population = []
     area_SQRKM = []
 
     for dic in data:
-        one_data = {}
-
-        one_data['LGA_name'] = dic['attributes']['LGA_NAME19']
         lga_name.append(dic['attributes']['LGA_NAME19'])
-
-        one_data['Population'] = dic['attributes']['Population']
         population.append(dic['attributes']['Population'])
-
-        one_data['Area(SQRKM)'] = dic['attributes']['AREASQKM19']
         area_SQRKM.append(dic['attributes']['AREASQKM19'])
-
-        integrated_data.append(one_data)
-
+        
     df = pd.DataFrame({'LGA_name': lga_name, 'Population': population, 'Area(SQRKM)': area_SQRKM})
-    df.to_excel('covid_data_VIC.xlsx', index=False)
+    df.to_excel(excel_file_name, index=False)
     return
 
 
-def append_daily_cases(date):
-    """this method will append new accumulative data as a new column to excel"""
-    """the variable - date will be append to the column, just for recognizing the current date"""
+def append_daily_cases(excel_file_name = 'covid_data_VIC.xlsx'):
+    """append new accumulative data as a new column to excel"""
+    """the variable - name of the file to be appended data, default is 'covid_data_VIC.xlsx'"""
 
     r_json = fetch_data_from_URL_query()
     data = r_json['features']
@@ -56,7 +45,9 @@ def append_daily_cases(date):
     # Columns in excel
     last_updated = []
     cases = []
-
+    
+    index = 0
+    date = ''
     for dic in data:
         time = str(dic['attributes']['LastUpdated'])
         if time.isnumeric():
@@ -64,6 +55,9 @@ def append_daily_cases(date):
             time = int(time)
             time = dt.fromtimestamp(time).strftime('%Y-%m-%d %I:%M:%S %p')                    
             last_updated.append(time)
+            if index == 0:
+                date = time[5:10]
+                index = 1
         else:
             last_updated.append('null')
         cases.append(dic['attributes']['Cases'])
@@ -71,9 +65,8 @@ def append_daily_cases(date):
     with open('covid_data_VIC.xlsx', 'rb') as f:
         df = pd.read_excel(f, index=False)
 
-    df['Last Updated'+date] = last_updated
-    df['Cases '+date] = cases
+    df['Last Updated ' + date] = last_updated
+    df['Cases ' + date] = cases
 
-    df.to_excel('covid_data_VIC.xlsx', index=False)
+    df.to_excel(excel_file_name, index=False)
     return
-   
