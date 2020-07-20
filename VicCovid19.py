@@ -62,7 +62,44 @@ def append_daily_cases(excel_file_name = 'covid_data_VIC.xlsx'):
             last_updated.append('null')
         cases.append(dic['attributes']['Cases'])
 
-    with open('covid_data_VIC.xlsx', 'rb') as f:
+    with open(excel_file_name, 'rb') as f:
+        df = pd.read_excel(f, index=False)
+
+    df['Last Updated ' + date] = last_updated
+    df['Cases ' + date] = cases
+
+    df.to_excel(excel_file_name, index=False)
+    return
+
+
+def append_past_cases(txt_file_name, excel_file_name = 'covid_data_VIC.xlsx'):
+    with open(txt_file_name) as f:
+        content = f.read()
+        content = eval(content)
+        data = content['features']
+        print(data)
+    
+    # Columns in excel
+    last_updated = []
+    cases = []
+    
+    index = 0
+    date = ''
+    for dic in data:
+        time = str(dic['attributes']['LastUpdated'])
+        if time.isnumeric():
+            time = time[:10]
+            time = int(time)
+            time = dt.fromtimestamp(time).strftime('%Y-%m-%d %I:%M:%S %p')                    
+            last_updated.append(time)
+            if index == 0:
+                date = time[5:10]
+                index = 1
+        else:
+            last_updated.append('null')
+        cases.append(dic['attributes']['Cases'])
+
+    with open(excel_file_name, 'rb') as f:
         df = pd.read_excel(f, index=False)
 
     df['Last Updated ' + date] = last_updated
