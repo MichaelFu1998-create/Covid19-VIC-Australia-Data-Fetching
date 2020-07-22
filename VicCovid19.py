@@ -6,7 +6,7 @@ Created on Sat Jul 18 00:46:45 2020
 """
 import requests
 import pandas as pd
-from datetime import datetime as dt
+from datetime import timedelta as td, datetime as dt
 
 
 def fetch_data_from_URL_query(url):
@@ -16,7 +16,7 @@ def fetch_data_from_URL_query(url):
     
 def create_excel_with_LGA_data(excel_file_name = 'covid_data_VIC.xlsx'):
     """the variable - name of the excel file, default is 'covid_data_VIC.xlsx'"""
-    url = 'https://services1.arcgis.com/vHnIGBHHqDR6y0CR/arcgis/rest/services/Victorian_LGA_Cases/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json'
+    url = 'https://services1.arcgis.com/vHnIGBHHqDR6y0CR/arcgis/rest/services/Victorian_LGA_Cases/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json'    
     r_json = fetch_data_from_URL_query(url)
     data = r_json['features']
     
@@ -37,8 +37,8 @@ def create_excel_with_LGA_data(excel_file_name = 'covid_data_VIC.xlsx'):
 
 def append_daily_cases(excel_file_name = 'covid_data_VIC.xlsx'):
     """append new accumulative data as a new column to excel"""
+    """append new daily cases as a new column to excel"""
     """the variable - name of the file to be appended data, default is 'covid_data_VIC.xlsx'"""
-    
     url = 'https://services1.arcgis.com/vHnIGBHHqDR6y0CR/arcgis/rest/services/Victorian_LGA_Cases/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json'
     r_json = fetch_data_from_URL_query(url)
     data = r_json['features']
@@ -68,11 +68,15 @@ def append_daily_cases(excel_file_name = 'covid_data_VIC.xlsx'):
 
     df['Last Updated ' + date] = last_updated
     df['Cases ' + date] = cases
-
+    
+    
+    yesterday_date = (dt.strptime(date, '%m-%d')- td(days=1)).strftime('%m-%d')      
+    df['New Cases ' + date] =  df['Cases ' + date] - df['Cases ' + yesterday_date]
+    
     df.to_excel(excel_file_name, index=False)
     return
 
-
+    
 def append_past_cases(txt_file_name, excel_file_name = 'covid_data_VIC.xlsx'):
     with open(txt_file_name) as f:
         content = f.read()
