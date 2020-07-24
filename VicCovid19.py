@@ -122,6 +122,8 @@ def append_daily_cases(excel_file_name = EXCEL_FILE_NAME):
     
     # to get the new cases today
     # have to substract cases yesterday
+    # if there is no data to substract
+    # catch the KeyError
     try:
         esterday_date = (dt.strptime(date, '%m-%d') - td(days=1)).strftime('%m-%d')      
         df['New Cases ' + date] =  df['Cases ' + date] - df['Cases ' + yesterday_date]
