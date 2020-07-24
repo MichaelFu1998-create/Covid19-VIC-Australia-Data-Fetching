@@ -122,11 +122,14 @@ def append_daily_cases(excel_file_name = EXCEL_FILE_NAME):
     
     # to get the new cases today
     # have to substract cases yesterday
-    yesterday_date = (dt.strptime(date, '%m-%d') - td(days=1)).strftime('%m-%d')      
-    df['New Cases ' + date] =  df['Cases ' + date] - df['Cases ' + yesterday_date]
-    
-    df.to_excel(excel_file_name, index=False)
-    return
+    try:
+        esterday_date = (dt.strptime(date, '%m-%d') - td(days=1)).strftime('%m-%d')      
+        df['New Cases ' + date] =  df['Cases ' + date] - df['Cases ' + yesterday_date]
+    except KeyError:
+        print('key error occurs due to not enough data in the excel')
+    finally:
+        df.to_excel(excel_file_name, index=False)
+        return
 
     
 def append_past_cases(txt_file_name, excel_file_name = EXCEL_FILE_NAME):
@@ -440,3 +443,4 @@ def predicted_new_cases_avg_increase_rate(predicted_date, no_of_days = NO_OF_DAY
     df[column_name] = (avg_increase_rate(predicted_date, no_of_days, output_percentage = False) + 1) * df[column_case]
     df.to_excel(excel_file_name, index=False)    
     return
+
