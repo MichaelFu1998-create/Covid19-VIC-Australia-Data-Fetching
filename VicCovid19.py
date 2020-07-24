@@ -125,7 +125,7 @@ def append_daily_cases(excel_file_name = EXCEL_FILE_NAME):
     # if there is no data to substract
     # catch the KeyError
     try:
-        esterday_date = (dt.strptime(date, '%m-%d') - td(days=1)).strftime('%m-%d')      
+        yesterday_date = (dt.strptime(date, '%m-%d') - td(days=1)).strftime('%m-%d')      
         df['New Cases ' + date] =  df['Cases ' + date] - df['Cases ' + yesterday_date]
     except KeyError:
         print('key error occurs due to not enough data in the excel')
